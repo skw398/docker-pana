@@ -1,0 +1,8 @@
+name: partial_score_package
+description: A fixture that intentionally misses scoring points, used to verify per-section scoring in the docker-pana image.
+version: 1.0.0
+# Present so that the pubspec subsection scores full points; this fixture only
+# omits LICENSE, CHANGELOG.md, an example, and dartdoc comments on purpose.
+homepage: https://example.com
+environment:
+  sdk: '>=3.11.0 <4.0.0'

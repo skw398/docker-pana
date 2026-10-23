@@ -1,0 +1,10 @@
+name: docker_pana_flutter_smoke
+description: A small Flutter widget fixture for checking SDK integration and documentation in the docker-pana image.
+version: 1.0.0
+homepage: https://flutter.dev
+environment:
+  sdk: '>=3.11.0 <4.0.0'
+  flutter: '>=3.47.0'
+dependencies:
+  flutter:
+    sdk: flutter

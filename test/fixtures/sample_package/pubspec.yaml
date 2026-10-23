@@ -1,0 +1,12 @@
+name: docker_pana_smoke
+description: A small fixture used to verify package analysis and screenshot processing in the docker-pana image.
+version: 1.0.0
+# Public documentation URL used as fixture metadata; this package is not published.
+homepage: https://dart.dev
+environment:
+  sdk: '>=3.11.0 <4.0.0'
+screenshots:
+  - description: A static PNG fixture.
+    path: screenshots/sample.png
+  - description: An animated GIF fixture.
+    path: screenshots/animated.gif

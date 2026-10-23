@@ -1,0 +1,49 @@
+name: Upstream drift
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Compare with pub.dev and update the issue
+        shell: sh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          body="$(sh test/check_upstream.sh)"
+          status=$?
+          set -e
+          printf '%s\n' "$body"
+          if [ "$status" -ne 0 ] && [ "$status" -ne 1 ]; then
+            exit "$status"
+          fi
+
+          title='Tracked dependency versions changed'
+          number="$(gh issue list --state open --search "$title in:title" --json number --jq '.[0].number // empty')"
+          normalize() { printf '%s' "$1" | tr -d '[:space:]'; }
+
+          if [ "$status" -eq 1 ]; then
+            if [ -z "$number" ]; then
+              gh issue create --title "$title" --body "$body"
+            else
+              current="$(gh issue view "$number" --json body --jq .body)"
+              if [ "$(normalize "$current")" != "$(normalize "$body")" ]; then
+                gh issue edit "$number" --body "$body"
+              fi
+            fi
+          elif [ -n "$number" ]; then
+            gh issue close "$number"
+          fi

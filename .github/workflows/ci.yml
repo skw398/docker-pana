@@ -1,0 +1,55 @@
+name: CI
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Lint shell scripts
+        shell: sh
+        # shellcheck 0.11.0 (digest-pinned)
+        run: docker run --rm -v "$PWD:/mnt:ro" -w /mnt koalaman/shellcheck@sha256:bb596a0d169b85ddd81d8b6d3a2ff6d5baf5fca10b97f575ebc647c3dff62b3d -s sh scripts/*.sh test/*.sh
+      - name: Lint workflows
+        shell: sh
+        # actionlint 1.7.12 (digest-pinned)
+        run: docker run --rm -v "$PWD:/mnt:ro" -w /mnt rhysd/actionlint@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check action image resolution
+        shell: sh
+        run: sh test/check_resolve_image.sh
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Build image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          platforms: linux/amd64
+          load: true
+          tags: docker-pana:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Analyze Dart fixture
+        uses: ./
+        with:
+          path: test/fixtures/sample_package
+          image: docker-pana:ci
+      - name: Analyze Flutter fixture
+        uses: ./
+        with:
+          path: test/fixtures/flutter_package
+          image: docker-pana:ci
+      - name: Verify score sections
+        shell: sh
+        run: sh test/verify_scores.sh docker-pana:ci partial_score_package

@@ -1,0 +1,42 @@
+name: docker-pana
+description: Analyze a Dart or Flutter package using a prebuilt docker-pana image.
+inputs:
+  path:
+    description: Package directory relative to the checked-out repository root.
+    required: false
+    default: '.'
+  exit-code-threshold:
+    description: Allowed missing points; 0 requires the maximum score.
+    required: false
+    default: '0'
+  image:
+    description: Prebuilt image reference; defaults to ghcr.io/<action-repository>:latest. A tag or digest may be specified.
+    required: false
+runs:
+  using: composite
+  steps:
+    - name: Analyze package
+      shell: sh
+      env:
+        PANA_PACKAGE_PATH: ${{ inputs.path }}
+        PANA_THRESHOLD: ${{ inputs.exit-code-threshold }}
+        PANA_IMAGE: ${{ inputs.image }}
+        PANA_ACTION_REPOSITORY: ${{ github.action_repository }}
+      run: |
+        set -eu
+        case "$PANA_THRESHOLD" in
+          ''|*[!0-9]*)
+            printf '%s\n' 'exit-code-threshold must be a non-negative integer.' >&2
+            exit 2
+            ;;
+        esac
+        PANA_IMAGE="$(sh "${{ github.action_path }}/scripts/resolve_image.sh")"
+        package_dir="$(cd "$GITHUB_WORKSPACE/$PANA_PACKAGE_PATH" && pwd -P)"
+        if [ ! -f "$package_dir/pubspec.yaml" ]; then
+          printf '%s\n' 'No pubspec.yaml found in the specified package directory.' >&2
+          exit 2
+        fi
+        docker run --rm --platform linux/amd64 --memory 4g \
+          --cap-drop=ALL --security-opt no-new-privileges --pids-limit 4096 \
+          --mount "type=bind,src=$package_dir,dst=/package,readonly" \
+          "$PANA_IMAGE" --exit-code-threshold "$PANA_THRESHOLD" /package

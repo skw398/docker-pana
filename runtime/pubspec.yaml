@@ -1,0 +1,6 @@
+name: docker_pana_runtime
+publish_to: none
+environment:
+  sdk: ^3.11.0
+dependencies:
+  pana: '0.23.19'
