@@ -38,8 +38,8 @@ the exit code is non-zero unless the package scores the maximum.
 
 | Tool | Version |
 | --- | --- |
-| Dart | 3.13.5 |
-| Flutter | 3.47.7 |
+| Dart | 3.13.7 |
+| Flutter | 3.47.8 |
 | pana | 0.23.19 |
 | dartdoc | 9.0.9 |
 | WebP | 1.3.2 |
