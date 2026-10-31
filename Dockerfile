@@ -24,15 +24,15 @@ USER pana
 WORKDIR /opt/pana
 
 RUN curl --fail --location --retry 3 \
-        https://storage.googleapis.com/dart-archive/channels/stable/release/3.13.5/sdk/dartsdk-linux-x64-release.zip -o /tmp/dart.zip \
-    && echo 'ea864bc64df30a6b8bdf30b2e32550f7717d9a890de8f40293aeabb924fe232b  /tmp/dart.zip' | sha256sum --check - \
+        https://storage.googleapis.com/dart-archive/channels/stable/release/3.13.7/sdk/dartsdk-linux-x64-release.zip -o /tmp/dart.zip \
+    && echo 'eb99aed266efbcb615c6ae21c12f52cfe935b9f208bccc5fea7f64c21e867229  /tmp/dart.zip' | sha256sum --check - \
     && unzip -q /tmp/dart.zip -d /opt && rm /tmp/dart.zip \
     && dart --disable-analytics \
     && mkdir -p /home/pana/config/dart-stable /home/pana/config/flutter-stable
 
 RUN curl --fail --location --retry 3 \
-        https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.47.7-stable.tar.xz -o /tmp/flutter.tar.xz \
-    && echo 'af7455f540df951184c7953fbe3cf884766e7541dacf8571f9f582db03dd6230  /tmp/flutter.tar.xz' | sha256sum --check - \
+        https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.47.8-stable.tar.xz -o /tmp/flutter.tar.xz \
+    && echo 'baf7dcc5a3dbba60fe863bf493a6cf203195621f7786eaa5a1bba02cd0d87dd2  /tmp/flutter.tar.xz' | sha256sum --check - \
     && tar --no-same-owner -xJf /tmp/flutter.tar.xz -C /opt && rm /tmp/flutter.tar.xz \
     && flutter --no-version-check config --no-analytics --no-cli-animations \
     && flutter --no-version-check doctor
@@ -74,8 +74,8 @@ COPY licenses/ /usr/share/licenses/libwebp/
 
 LABEL org.opencontainers.image.title="docker-pana" \
     dev.docker-pana.upstream.repository="https://github.com/dart-lang/pub-dev" \
-    dev.docker-pana.dart="3.13.5" \
-    dev.docker-pana.flutter="3.47.7" \
+    dev.docker-pana.dart="3.13.7" \
+    dev.docker-pana.flutter="3.47.8" \
     dev.docker-pana.pana="0.23.19" \
     dev.docker-pana.dartdoc="9.0.9" \
     dev.docker-pana.webp="1.3.2"
