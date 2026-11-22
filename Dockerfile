@@ -24,15 +24,15 @@ USER pana
 WORKDIR /opt/pana
 
 RUN curl --fail --location --retry 3 \
-        https://storage.googleapis.com/dart-archive/channels/stable/release/3.13.7/sdk/dartsdk-linux-x64-release.zip -o /tmp/dart.zip \
-    && echo 'eb99aed266efbcb615c6ae21c12f52cfe935b9f208bccc5fea7f64c21e867229  /tmp/dart.zip' | sha256sum --check - \
+        https://storage.googleapis.com/dart-archive/channels/stable/release/3.14.0/sdk/dartsdk-linux-x64-release.zip -o /tmp/dart.zip \
+    && echo '90f7fd75fe21e16437778df882f280910d9bbd4809c90024f21de82435dded1d  /tmp/dart.zip' | sha256sum --check - \
     && unzip -q /tmp/dart.zip -d /opt && rm /tmp/dart.zip \
     && dart --disable-analytics \
     && mkdir -p /home/pana/config/dart-stable /home/pana/config/flutter-stable
 
 RUN curl --fail --location --retry 3 \
-        https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.47.8-stable.tar.xz -o /tmp/flutter.tar.xz \
-    && echo 'baf7dcc5a3dbba60fe863bf493a6cf203195621f7786eaa5a1bba02cd0d87dd2  /tmp/flutter.tar.xz' | sha256sum --check - \
+        https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.50.0-stable.tar.xz -o /tmp/flutter.tar.xz \
+    && echo '6ea2d806fd57269ae783e6788e2a81fc26eaad782f1e0d0ff38623bb765ff9f5  /tmp/flutter.tar.xz' | sha256sum --check - \
     && tar --no-same-owner -xJf /tmp/flutter.tar.xz -C /opt && rm /tmp/flutter.tar.xz \
     && flutter --no-version-check config --no-analytics --no-cli-animations \
     && flutter --no-version-check doctor
@@ -59,8 +59,8 @@ RUN dart pub get --enforce-lockfile \
         "$PUB_CACHE/hosted/pub.dev/pana-0.23.19/bin/pana.dart" -o bin/pana \
     && cp -R "$PUB_CACHE/hosted/pub.dev/pana-0.23.19/lib/src/third_party/spdx/licenses" /opt/pana/licenses
 
-RUN dart pub unpack dartdoc:9.0.9 --output /opt \
-    && mv /opt/dartdoc-9.0.9 /opt/dartdoc && cd /opt/dartdoc \
+RUN dart pub unpack dartdoc:9.0.11 --output /opt \
+    && mv /opt/dartdoc-9.0.11 /opt/dartdoc && cd /opt/dartdoc \
     && mkdir build && dart compile exe -o build/dartdoc bin/dartdoc.dart
 
 # Distribution notices; separate from the SPDX data used for scoring.
@@ -74,10 +74,10 @@ COPY licenses/ /usr/share/licenses/libwebp/
 
 LABEL org.opencontainers.image.title="docker-pana" \
     dev.docker-pana.upstream.repository="https://github.com/dart-lang/pub-dev" \
-    dev.docker-pana.dart="3.13.7" \
-    dev.docker-pana.flutter="3.47.8" \
+    dev.docker-pana.dart="3.14.0" \
+    dev.docker-pana.flutter="3.50.0" \
     dev.docker-pana.pana="0.23.19" \
-    dev.docker-pana.dartdoc="9.0.9" \
+    dev.docker-pana.dartdoc="9.0.11" \
     dev.docker-pana.webp="1.3.2"
 
 WORKDIR /package
